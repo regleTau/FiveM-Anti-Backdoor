@@ -1,0 +1,75 @@
+{
+  "app": {
+    "name": "FiveM Anti-Backdoor",
+    "version": "1.0.0",
+    "description": "FiveM Server Security Scanner - Static Analysis Tool"
+  },
+  "scan": {
+    "max_file_size_mb": 50,
+    "skip_extensions": [".png", ".jpg", ".jpeg", ".gif", ".svg", ".mp3", ".mp4", ".ogg", ".wav", ".dds", ".ytd", ".ydr", ".yft", ".zip", ".rar", ".7z"],
+    "lua_extensions": [".lua"],
+    "js_extensions": [".js", ".mjs"],
+    "manifest_names": ["fxmanifest.lua", "__resource.lua"],
+    "quick_scan_files": ["fxmanifest.lua", "__resource.lua", "server.lua", "client.lua", "shared.lua", "config.lua", "main.lua"],
+    "max_workers": 4,
+    "enable_obfuscation_check": true,
+    "enable_change_detection": true
+  },
+  "risk": {
+    "critical_threshold": 80,
+    "high_threshold": 60,
+    "medium_threshold": 40,
+    "low_threshold": 20,
+    "severity_weights": {
+      "CRITICAL": 30,
+      "HIGH": 15,
+      "MEDIUM": 7,
+      "LOW": 3
+    },
+    "max_score": 100
+  },
+  "quarantine": {
+    "directory": "quarantine",
+    "auto_quarantine_critical": false
+  },
+  "backup": {
+    "directory": "backups",
+    "max_backups_per_resource": 10
+  },
+  "reports": {
+    "directory": "scan_reports",
+    "auto_generate_html": true,
+    "auto_generate_json": false
+  },
+  "database": {
+    "path": "fivem_security.db"
+  },
+  "monitor": {
+    "enabled": false,
+    "poll_interval_seconds": 5,
+    "auto_scan_on_change": true
+  },
+  "ui": {
+    "theme": "dark",
+    "font_family": "Segoe UI",
+    "font_size": 13
+  },
+  "whitelist": {
+    "domains": [
+      "github.com",
+      "raw.githubusercontent.com",
+      "cfx.re",
+      "forum.cfx.re",
+      "runtime.fivem.net"
+    ],
+    "resource_names": [],
+    "known_good_patterns": [
+      "ESX",
+      "QBCore",
+      "Qbox",
+      "vRP",
+      "ox_lib",
+      "ox_inventory"
+    ]
+  }
+}

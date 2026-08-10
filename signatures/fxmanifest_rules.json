@@ -1,0 +1,72 @@
+{
+  "version": "1.0.0",
+  "description": "FiveM manifest (fxmanifest.lua / __resource.lua) analysis rules",
+  "rules": [
+    {
+      "id": "MANIFEST-001",
+      "name": "Hidden Server Script",
+      "severity": "HIGH",
+      "confidence": 80,
+      "description": "Manifest references a server script with a suspicious or hidden name.",
+      "recommendation": "Inspect the referenced file. Hidden scripts with obfuscated names are red flags.",
+      "pattern_type": "regex",
+      "patterns": ["server_script\\s+['\"][^'\"]*(?:\\.min\\.lua|\\.o\\.lua|_[a-f0-9]{8,}\\.lua)['\"]"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "MANIFEST-002",
+      "name": "Remote URL in Manifest",
+      "severity": "LOW",
+      "confidence": 30,
+      "description": "Manifest includes a remote URL. Usually metadata, but can be a remote script loader if placed inside script directives.",
+      "recommendation": "Remove remote URLs from manifests if they are script loaders.",
+      "pattern_type": "regex",
+      "patterns": ["['\"]https?://[^'\"]+['\"]"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "MANIFEST-003",
+      "name": "Suspicious Dependency",
+      "severity": "MEDIUM",
+      "confidence": 60,
+      "description": "Resource depends on a resource with a suspicious or generic name.",
+      "recommendation": "Verify all declared dependencies exist and are trusted resources.",
+      "pattern_type": "regex",
+      "patterns": ["dependency\\s+['\"](?:loader|injector|hook|patch|exploit|bypass)['\"]"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "MANIFEST-004",
+      "name": "Missing or Empty Manifest",
+      "severity": "MEDIUM",
+      "confidence": 70,
+      "description": "Resource directory lacks a proper manifest file, which is non-standard.",
+      "recommendation": "Ensure every resource has a valid fxmanifest.lua or __resource.lua.",
+      "pattern_type": "structural",
+      "check": "missing_manifest",
+      "file_types": []
+    },
+    {
+      "id": "MANIFEST-005",
+      "name": "Script Reference to Non-Existent File",
+      "severity": "LOW",
+      "confidence": 40,
+      "description": "Manifest references a script file that does not exist in the resource directory.",
+      "recommendation": "Verify resource configuration integrity.",
+      "pattern_type": "structural",
+      "check": "missing_script_file",
+      "file_types": ["lua"]
+    },
+    {
+      "id": "MANIFEST-006",
+      "name": "Unusual File Type Included",
+      "severity": "MEDIUM",
+      "confidence": 65,
+      "description": "Manifest includes file types not normally used in FiveM resources (e.g., .exe, .dll, .bat).",
+      "recommendation": "Remove unusual file inclusions. Only include legitimate resource assets.",
+      "pattern_type": "regex",
+      "patterns": ["files\\s*\\{[^}]*(?:\\.exe|\\.dll|\\.bat|\\.cmd|\\.sh|/\\.)[^}]*\\}"],
+      "file_types": ["lua"]
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "version": "1.0.0",
+  "description": "JavaScript suspicious code patterns for FiveM NUI resources",
+  "rules": [
+    {
+      "id": "JS-SUSP-001",
+      "name": "eval() Dynamic Code Execution",
+      "severity": "HIGH",
+      "confidence": 85,
+      "description": "Uses eval() to execute dynamic code, a common attack vector in NUI resources.",
+      "recommendation": "Remove eval() usage. Use safe alternatives.",
+      "pattern_type": "regex",
+      "patterns": ["\\beval\\s*\\("],
+      "file_types": ["js"]
+    },
+    {
+      "id": "JS-SUSP-002",
+      "name": "Function Constructor Execution",
+      "severity": "HIGH",
+      "confidence": 82,
+      "description": "Uses new Function() to execute dynamic code.",
+      "recommendation": "Remove new Function() constructor usage.",
+      "pattern_type": "regex",
+      "patterns": ["new\\s+Function\\s*\\("],
+      "file_types": ["js"]
+    },
+    {
+      "id": "JS-SUSP-003",
+      "name": "External Script Loading",
+      "severity": "HIGH",
+      "confidence": 80,
+      "description": "Dynamically loads external scripts, which can introduce malicious code.",
+      "recommendation": "Remove dynamic external script loading. All scripts should be local.",
+      "pattern_type": "regex",
+      "patterns": ["document\\.createElement\\s*\\(\\s*['\"]script['\"]\\s*\\)"],
+      "file_types": ["js", "html"]
+    },
+    {
+      "id": "JS-SUSP-004",
+      "name": "Obfuscated JavaScript (atob/btoa)",
+      "severity": "MEDIUM",
+      "confidence": 70,
+      "description": "Uses atob()/btoa() Base64 functions to encode/decode hidden payloads.",
+      "recommendation": "Decode and inspect the Base64 content.",
+      "pattern_type": "regex",
+      "patterns": ["\\batob\\s*\\(", "\\bbtoa\\s*\\("],
+      "file_types": ["js"]
+    },
+    {
+      "id": "JS-SUSP-005",
+      "name": "XMLHttpRequest to External URL",
+      "severity": "MEDIUM",
+      "confidence": 65,
+      "description": "Makes an XHR request to an external URL from NUI code.",
+      "recommendation": "NUI resources should only communicate with the game via PostMessage. External XHR is suspicious.",
+      "pattern_type": "regex",
+      "patterns": ["new XMLHttpRequest\\s*\\(", "fetch\\s*\\(\\s*['\"]http"],
+      "file_types": ["js"]
+    },
+    {
+      "id": "JS-SUSP-006",
+      "name": "WebSocket Connection to External Host",
+      "severity": "HIGH",
+      "confidence": 78,
+      "description": "Opens a WebSocket connection to an external host for potential C2 communication.",
+      "recommendation": "Remove WebSocket connections to external hosts from NUI resources.",
+      "pattern_type": "regex",
+      "patterns": ["new WebSocket\\s*\\(\\s*['\"]wss?://(?!localhost|127\\.0\\.0\\.1)"],
+      "file_types": ["js"]
+    },
+    {
+      "id": "JS-SUSP-007",
+      "name": "JavaScript Hex String Encoding",
+      "severity": "MEDIUM",
+      "confidence": 65,
+      "description": "Contains hex-encoded strings that may be hiding malicious payloads.",
+      "recommendation": "Decode and inspect the hex strings.",
+      "pattern_type": "regex",
+      "patterns": ["(?:\\\\x[0-9a-fA-F]{2}){10,}"],
+      "file_types": ["js"]
+    },
+    {
+      "id": "JS-SUSP-008",
+      "name": "Clipboard Access",
+      "severity": "MEDIUM",
+      "confidence": 60,
+      "description": "Accesses the system clipboard, potentially to steal copied tokens or passwords.",
+      "recommendation": "Review clipboard usage. Remove if not necessary.",
+      "pattern_type": "regex",
+      "patterns": ["navigator\\.clipboard", "document\\.execCommand\\s*\\(\\s*['\"]copy['\"]"],
+      "file_types": ["js"]
+    }
+  ]
+}

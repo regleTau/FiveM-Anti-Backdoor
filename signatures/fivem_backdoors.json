@@ -1,0 +1,193 @@
+{
+  "version": "1.0.0",
+  "description": "FiveM-specific backdoor signatures",
+  "rules": [
+    {
+      "id": "FIVEM-BACK-001",
+      "name": "Remote Code Loader via PerformHttpRequest",
+      "severity": "CRITICAL",
+      "confidence": 95,
+      "description": "Downloads external code and executes it dynamically using loadstring.",
+      "recommendation": "Quarantine immediately. Inspect the remote endpoint and remove the download+execute chain.",
+      "pattern_type": "combination",
+      "patterns": ["PerformHttpRequest", "loadstring"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-BACK-002",
+      "name": "Loadstring Dynamic Execution",
+      "severity": "HIGH",
+      "confidence": 85,
+      "description": "Uses loadstring() to dynamically compile and execute a string as Lua code.",
+      "recommendation": "Review what string is being executed. Remove if not legitimate.",
+      "pattern_type": "regex",
+      "patterns": ["loadstring\\s*\\("],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-BACK-003",
+      "name": "OS Command Execution",
+      "severity": "CRITICAL",
+      "confidence": 98,
+      "description": "Executes system shell commands via os.execute or io.popen.",
+      "recommendation": "Remove immediately. FiveM resources must never execute system commands.",
+      "pattern_type": "regex",
+      "patterns": ["os\\.execute\\s*\\(", "io\\.popen\\s*\\("],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-BACK-004",
+      "name": "Hidden Event Handler with Remote Trigger",
+      "severity": "HIGH",
+      "confidence": 80,
+      "description": "Registers a net event that triggers remote code execution when called.",
+      "recommendation": "Audit event handler. Ensure it does not execute arbitrary code from event arguments.",
+      "pattern_type": "combination",
+      "patterns": ["RegisterNetEvent", "loadstring"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-BACK-005",
+      "name": "Discord Webhook Data Exfiltration",
+      "severity": "HIGH",
+      "confidence": 90,
+      "description": "Sends data to a Discord webhook URL, potentially exfiltrating sensitive server information.",
+      "recommendation": "Review what data is sent. Discord webhooks used for exfiltration should be removed.",
+      "pattern_type": "regex",
+      "patterns": ["discord\\.com/api/webhooks/\\d+/[A-Za-z0-9_\\-]+"],
+      "file_types": ["lua", "js", "json"]
+    },
+    {
+      "id": "FIVEM-BACK-006",
+      "name": "Base64 Decode and Execute Chain",
+      "severity": "CRITICAL",
+      "confidence": 92,
+      "description": "Decodes a Base64 payload and executes it, a common backdoor obfuscation technique.",
+      "recommendation": "Quarantine resource. Decode the payload manually and inspect its contents.",
+      "pattern_type": "combination",
+      "patterns": ["base64", "loadstring"],
+      "file_types": ["lua", "js"]
+    },
+    {
+      "id": "FIVEM-BACK-007",
+      "name": "Suspicious SaveResourceFile Usage",
+      "severity": "HIGH",
+      "confidence": 78,
+      "description": "Writes data to resource files dynamically, which can be used to plant backdoors.",
+      "recommendation": "Review what data is written and to which file. Remove if not legitimate.",
+      "pattern_type": "regex",
+      "patterns": ["SaveResourceFile\\s*\\("],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-BACK-008",
+      "name": "Load Function Dynamic Execution",
+      "severity": "HIGH",
+      "confidence": 83,
+      "description": "Uses Lua load() function to compile and execute a dynamic string.",
+      "recommendation": "Review the string being loaded. Remove if the source is untrusted.",
+      "pattern_type": "regex",
+      "patterns": ["(?<![\\w])load\\s*\\((?!string|file|resource)"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-BACK-009",
+      "name": "Remote Script Download Pattern",
+      "severity": "CRITICAL",
+      "confidence": 94,
+      "description": "Downloads a script from an external URL and saves/executes it.",
+      "recommendation": "Quarantine resource. This is a classic backdoor installation technique.",
+      "pattern_type": "combination",
+      "patterns": ["PerformHttpRequest", "SaveResourceFile"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-BACK-010",
+      "name": "Token/Credential Stealing via HTTP",
+      "severity": "CRITICAL",
+      "confidence": 88,
+      "description": "Sends what appears to be tokens or credentials to an external server.",
+      "recommendation": "Quarantine resource. Rotate any potentially compromised credentials.",
+      "pattern_type": "combination",
+      "patterns": ["PerformHttpRequest", "GetConvar", "token|password|leak|exfiltrate|secret_key"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-BACK-011",
+      "name": "Filesystem Traversal",
+      "severity": "HIGH",
+      "confidence": 80,
+      "description": "Attempts to read files outside the resource directory.",
+      "recommendation": "Remove directory traversal attempts.",
+      "pattern_type": "regex",
+      "patterns": ["\\.\\./", "\\.\\.\\\\" ],
+      "file_types": ["lua", "js"]
+    },
+    {
+      "id": "FIVEM-BACK-012",
+      "name": "Environment Variable Exfiltration",
+      "severity": "HIGH",
+      "confidence": 82,
+      "description": "Reads environment variables and may send them to external endpoints.",
+      "recommendation": "Review usage. Environment variable access combined with HTTP requests is suspicious.",
+      "pattern_type": "combination",
+      "patterns": ["os.getenv", "PerformHttpRequest"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-BACK-013",
+      "name": "Suspicious pcall with Encoded Payload",
+      "severity": "HIGH",
+      "confidence": 75,
+      "description": "Uses pcall to silently execute potentially malicious code and hide errors.",
+      "recommendation": "Inspect the pcall arguments for obfuscated or encoded payloads.",
+      "pattern_type": "combination",
+      "patterns": ["pcall", "loadstring"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-BACK-014",
+      "name": "JavaScript eval() Dynamic Execution",
+      "severity": "HIGH",
+      "confidence": 85,
+      "description": "Uses eval() in NUI JavaScript to execute dynamic code.",
+      "recommendation": "Remove eval() usage. Use safe alternatives.",
+      "pattern_type": "regex",
+      "patterns": ["\\beval\\s*\\("],
+      "file_types": ["js"]
+    },
+    {
+      "id": "FIVEM-BACK-015",
+      "name": "JavaScript Function Constructor Execution",
+      "severity": "HIGH",
+      "confidence": 82,
+      "description": "Uses Function() constructor to create and execute dynamic code, similar to eval.",
+      "recommendation": "Remove Function() constructor usage for dynamic code execution.",
+      "pattern_type": "regex",
+      "patterns": ["new\\s+Function\\s*\\("],
+      "file_types": ["js"]
+    },
+    {
+      "id": "FIVEM-BACK-016",
+      "name": "Identifier Exfiltration via HTTP",
+      "severity": "HIGH",
+      "confidence": 85,
+      "description": "Collects player identifiers (steam, license, discord, ip) and sends them to an external endpoint.",
+      "recommendation": "Investigate destination URL. Exfiltrating identifiers is suspicious.",
+      "pattern_type": "combination",
+      "patterns": ["PerformHttpRequest", "GetPlayerIdentifier", "discord|license|steam|ip|endpoint|leak"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-BACK-017",
+      "name": "Unauthenticated Command Execution",
+      "severity": "HIGH",
+      "confidence": 80,
+      "description": "Registers a net event that directly maps to ExecuteCommand execution.",
+      "recommendation": "Audit command event. Ensure proper ACE permission checks are integrated.",
+      "pattern_type": "combination",
+      "patterns": ["RegisterNetEvent", "ExecuteCommand"],
+      "file_types": ["lua"]
+    }
+  ]
+}

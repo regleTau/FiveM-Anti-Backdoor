@@ -1,0 +1,61 @@
+{
+  "version": "1.0.0",
+  "description": "FiveM suspicious (but not necessarily malicious) code patterns",
+  "rules": [
+    {
+      "id": "FIVEM-SUSP-003",
+      "name": "HTTP Request to Non-Standard Endpoint",
+      "severity": "LOW",
+      "confidence": 30,
+      "description": "Makes an HTTP request to an external domain. Legitimate scripts use this for updates, but it can be used for remote payloads.",
+      "recommendation": "Verify that the requested domain is trusted.",
+      "pattern_type": "regex",
+      "patterns": ["PerformHttpRequest\\s*\\(\\s*['\"]https?://(?!github\\.com|raw\\.githubusercontent\\.com|cfx\\.re|runtime\\.fivem\\.net|forum\\.cfx\\.re)[^'\"]+['\"]"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-SUSP-004",
+      "name": "Raw SQL Query Construction",
+      "severity": "MEDIUM",
+      "confidence": 50,
+      "description": "Constructs SQL queries using string concatenation. This can be vulnerable to SQL injection if player input is used.",
+      "recommendation": "Use parameterized queries or prepared statements.",
+      "pattern_type": "regex",
+      "patterns": ["MySQL\\.(?:query|execute|update|insert)\\s*\\(\\s*[^,]+\\.\\."],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-SUSP-005",
+      "name": "TriggerClientEvent Broadcast",
+      "severity": "LOW",
+      "confidence": 40,
+      "description": "Triggers a client event on all connected players (-1 source). Verify that no sensitive client operations are triggered globally.",
+      "recommendation": "Review the event payload. Ensure it does not transmit sensitive configuration.",
+      "pattern_type": "regex",
+      "patterns": ["TriggerClientEvent\\s*\\(\\s*['\"][^'\"]+['\"]\\s*,\\s*-1"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-SUSP-008",
+      "name": "Programmatic Resource Management",
+      "severity": "MEDIUM",
+      "confidence": 60,
+      "description": "Programmatically stops or starts resources. This can be used by backdoors to disable security/logging resources.",
+      "recommendation": "Ensure this resource is authorized to manage other resources.",
+      "pattern_type": "regex",
+      "patterns": ["StopResource\\s*\\(", "StartResource\\s*\\(", "RestartResource\\s*\\("],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "FIVEM-SUSP-009",
+      "name": "Sensitive File Read Access",
+      "severity": "MEDIUM",
+      "confidence": 55,
+      "description": "Reads files from sensitive paths or searches for credential keywords.",
+      "recommendation": "Ensure no sensitive configuration or database credentials are read and transmitted.",
+      "pattern_type": "regex",
+      "patterns": ["LoadResourceFile\\s*\\([^)]*(?:config|secret|key|pass|token|credential)"],
+      "file_types": ["lua"]
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "version": "1.0.0",
+  "description": "Lua obfuscation detection signatures",
+  "rules": [
+    {
+      "id": "LUA-OBF-001",
+      "name": "Long Single-Line Lua Code",
+      "severity": "MEDIUM",
+      "confidence": 70,
+      "description": "Extremely long single lines of Lua code often indicate obfuscated or packed scripts.",
+      "recommendation": "Manually deobfuscate and inspect the code.",
+      "pattern_type": "line_length",
+      "threshold": 500,
+      "file_types": ["lua"]
+    },
+    {
+      "id": "LUA-OBF-002",
+      "name": "Base64 Encoded String",
+      "severity": "MEDIUM",
+      "confidence": 72,
+      "description": "Contains a Base64-encoded string that may hide malicious payloads.",
+      "recommendation": "Decode the Base64 string and inspect its contents.",
+      "pattern_type": "regex",
+      "patterns": ["[A-Za-z0-9+/]{40,}={0,2}"],
+      "file_types": ["lua", "js"]
+    },
+    {
+      "id": "LUA-OBF-003",
+      "name": "Hexadecimal String Payload",
+      "severity": "MEDIUM",
+      "confidence": 68,
+      "description": "Contains a long hexadecimal string that may encode hidden data or payloads.",
+      "recommendation": "Decode the hex string and inspect its contents.",
+      "pattern_type": "regex",
+      "patterns": ["(?:0x[0-9a-fA-F]{2,}[,\\s]){10,}"],
+      "file_types": ["lua", "js"]
+    },
+    {
+      "id": "LUA-OBF-004",
+      "name": "Obfuscated Variable Names",
+      "severity": "LOW",
+      "confidence": 55,
+      "description": "Contains many single-character or randomly named variables, suggesting obfuscation.",
+      "recommendation": "Review the script for hidden functionality.",
+      "pattern_type": "regex",
+      "patterns": ["local\\s+[a-zA-Z]{1,2}\\s*=\\s*[a-zA-Z]{1,2}\\s*\\("],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "LUA-OBF-005",
+      "name": "String.char() Obfuscation",
+      "severity": "MEDIUM",
+      "confidence": 75,
+      "description": "Uses string.char() with numeric values to hide string content from static analysis.",
+      "recommendation": "Evaluate the constructed string to inspect hidden content.",
+      "pattern_type": "regex",
+      "patterns": ["string\\.char\\s*\\((?:\\s*\\d+\\s*,?\\s*){5,}\\)"],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "LUA-OBF-006",
+      "name": "String.byte() Obfuscation",
+      "severity": "LOW",
+      "confidence": 55,
+      "description": "Uses string.byte() to obscure string comparison operations.",
+      "recommendation": "Review usage in context.",
+      "pattern_type": "regex",
+      "patterns": ["string\\.byte\\s*\\("],
+      "file_types": ["lua"]
+    },
+    {
+      "id": "LUA-OBF-007",
+      "name": "Escape-Heavy String Literal",
+      "severity": "MEDIUM",
+      "confidence": 65,
+      "description": "Contains strings with excessive escape sequences, often used to hide code.",
+      "recommendation": "Decode the escape sequences and inspect the resulting string.",
+      "pattern_type": "regex",
+      "patterns": ["(?:\\\\x[0-9a-fA-F]{2}){10,}"],
+      "file_types": ["lua", "js"]
+    },
+    {
+      "id": "LUA-OBF-008",
+      "name": "Nested Function Wrapping",
+      "severity": "MEDIUM",
+      "confidence": 60,
+      "description": "Deeply nested function calls often indicate layered obfuscation.",
+      "recommendation": "Manually unwrap and analyze the nested functions.",
+      "pattern_type": "regex",
+      "patterns": ["\\(\\(\\(\\(\\("],
+      "file_types": ["lua", "js"]
+    },
+    {
+      "id": "LUA-OBF-009",
+      "name": "Lua Bytecode Header",
+      "severity": "HIGH",
+      "confidence": 90,
+      "description": "File starts with Lua bytecode signature. Pre-compiled bytecode hides source and is suspicious.",
+      "recommendation": "Do not run. Decompile and inspect the bytecode.",
+      "pattern_type": "bytes",
+      "magic": "\\x1bLua",
+      "file_types": ["lua"]
+    },
+    {
+      "id": "LUA-OBF-010",
+      "name": "XOR Decode Loop",
+      "severity": "HIGH",
+      "confidence": 80,
+      "description": "Contains an XOR decoding loop, commonly used to decrypt hidden payloads.",
+      "recommendation": "Manually decode the XOR payload and inspect its contents.",
+      "pattern_type": "regex",
+      "patterns": ["(?:bxor|bit\\.bxor|~).*(?:for|while|repeat)"],
+      "file_types": ["lua"]
+    }
+  ]
+}
