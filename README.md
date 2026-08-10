@@ -28,6 +28,12 @@ To launch the PySide6 UI:
 python main.py
 ```
 
+## Downloads
+
+Download the latest Windows executable from the GitHub Releases page:
+
+- [FiveM Anti Backdoor v1.0.0](https://github.com/regleTau/FiveM-Anti-Backdoor/releases/tag/v1.0.0)
+
 ## Compiling into a Standalone Executable (.exe)
 
 Compile the application to a single binary using the provided build script:
